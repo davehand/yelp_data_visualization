@@ -52,3 +52,9 @@ docs/_build/
 
 # PyBuilder
 target/
+
+dataset/
+csvs/originals
+csvs/review.csv
+inserts/review.sql
+inserts/review.csv
