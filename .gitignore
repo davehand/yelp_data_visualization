@@ -56,5 +56,6 @@ target/
 dataset/
 csvs/originals
 csvs/review.csv
+inserts/review/
 inserts/review.sql
 inserts/review.csv

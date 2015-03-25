@@ -18,7 +18,8 @@ with open("review.csv", "rb") as source:
             for c in r:
                 row_one.append(c)
             header_string += row_one[0].rstrip()
-            for x in range(1,len(row_one)):
+            #for x in range(1,len(row_one)):
+            for x in range(1,3):
                 header_string += ", " + row_one[x].rstrip()
         else:
             cols = []
@@ -29,7 +30,8 @@ with open("review.csv", "rb") as source:
             else:
                 values_string = "'" +  cols[0].rstrip() + "'"
             i = 0
-            for x in range(1,len(cols)):
+            #for x in range(1,len(cols)):
+            for x in range(1,3):
                 if (cols[x].rstrip() == ''):
                     values_string += ", null"
                 else:

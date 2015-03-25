@@ -3,7 +3,7 @@ Create table business (
   name varchar2(100),
   full_address varchar2(150),
   city varchar2(50),
-  state char(2),
+  state varchar2(5),
   latitude varchar2(20),
   longitude varchar2(20),
   CONSTRAINT business_id_pk PRIMARY KEY (business_id)
@@ -22,7 +22,6 @@ Create table review (
   review_id char(22) not null,
   business_id char(22) not null,
   stars number(1),
-  text varchar2(4000),
   CONSTRAINT business_review_pk PRIMARY KEY (review_id, business_id),
   CONSTRAINT fk_business_id2
     FOREIGN KEY (business_id)
