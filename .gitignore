@@ -62,6 +62,6 @@ inserts/review.csv
 
 
 # Django unzip
-django-1.7.7/
 django-1.7.7/*
+django-1.7.7/*/
 !django-1.7.7/Django-1.7.7.tar.gz
