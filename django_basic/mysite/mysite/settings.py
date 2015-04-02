@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+os.environ['LD_LIBRARY_PATH'] = '/usr/lib/oracle/11.2/client64/lib/'
+os.environ['ORACLE_HOME'] = '/usr/lib/oracle/11.2/client64/'
 
 
 # Quick-start development settings - unsuitable for production
@@ -37,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'polls',
+    'yelpviz',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -59,8 +62,12 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3')
+        'ENGINE': 'django.db.backends.oracle',
+        'NAME': 'ouryelp',
+        'USER': 'damn',
+        'PASSWORD': 'damnyelp',
+        'HOST': 'yelp.czscqrbdzjc7.us-east-1.rds.amazonaws.com',
+        'PORT': '1521',
     }
 }
 
