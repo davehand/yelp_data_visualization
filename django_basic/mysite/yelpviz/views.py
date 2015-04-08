@@ -1,5 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.shortcuts import render_to_response
 import sys
 
 import os
@@ -29,3 +30,6 @@ def index(request):
 	con.close()
 
 	return HttpResponse(resp)
+
+def home(request):
+	return render_to_response("yelpviz/map.html")
