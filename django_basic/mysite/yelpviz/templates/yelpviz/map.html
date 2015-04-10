@@ -1,6 +1,13 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <!-- Used for Google+ Sign in -->
+    <meta name="google-signin-clientid" content="9623654849-crp8t34rpcaeukbsbri3spv8v7qvsbjo.apps.googleusercontent.com" />
+    <meta name="google-signin-scope" content="https://www.googleapis.com/auth/plus.login" />
+    <meta name="google-signin-requestvisibleactions" content="http://schema.org/AddAction" />
+    <meta name="google-signin-cookiepolicy" content="single_host_origin" />
+    <script src="https://apis.google.com/js/client:platform.js?onload=render" async defer></script>
+    
     {% load staticfiles %}
     <link rel="stylesheet" type="text/css" href="{% static "yelpviz/map.css" %}">
     <script 
@@ -8,6 +15,8 @@
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBAw0e_FoeYsU00AS1QBNmhwa2k__QJWV0">
     </script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+
+    <!-- GOOGLE MAPS -->
     <script type="text/javascript">
       var overlay;
       USGSOverlay.prototype = new google.maps.OverlayView();
@@ -115,21 +124,28 @@
   </head>
   <body>
     <div id="map-canvas"></div>
-    <div id="fb-login-details">
-      <!-- Facebook login button -->
-      <fb:login-button autologoutlink="true" onlogin="checkLoginState()"></fb:login-button>
-      <div id="fb-root"></div>
-      <div id="fb-logged-in-gui" display="none">
-        <!-- Facebook login status -->
-        <div id="fb-status"></div>
-        <div id="fb-actions"
-          class="fb-like"
-          data-share="true"
-          data-width="100"
-          layout="button_count">
+    <div id="login">
+      <div id="fb-login-details">
+        <!-- Facebook login button -->
+        <fb:login-button autologoutlink="true" onlogin="checkLoginState()"></fb:login-button>
+        <div id="fb-root"></div>
+        <div id="fb-logged-in-gui" display="none">
+          <!-- Facebook login status -->
+          <div id="fb-status"></div>
+          <div id="fb-actions"
+            class="fb-like"
+            data-share="true"
+            data-width="100"
+            layout="button_count">
+          </div>
         </div>
       </div>
 
+      <div id="google-login-details">
+        <button 
+          id="google-login-button"
+          onclick="googleLogin()">Sign in with Google</button>
+      </div>
     </div>
   </body>
 </html>

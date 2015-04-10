@@ -6,7 +6,7 @@ html, body, #map-canvas {
 	z-index  : 0;
 }
 
-#map-options, #fb-login-details {
+#map-options, #login {
 	position : absolute;
 	right    : 10px;
 	top      : 50px;
