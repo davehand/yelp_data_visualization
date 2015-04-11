@@ -1,20 +1,27 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <!-- Used for Google+ Sign in -->
     <meta name="google-signin-clientid" content="9623654849-crp8t34rpcaeukbsbri3spv8v7qvsbjo.apps.googleusercontent.com" />
     <meta name="google-signin-scope" content="https://www.googleapis.com/auth/plus.login" />
     <meta name="google-signin-requestvisibleactions" content="http://schema.org/AddAction" />
     <meta name="google-signin-cookiepolicy" content="single_host_origin" />
-    <script src="https://apis.google.com/js/client:platform.js?onload=render" async defer></script>
     
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">    
     {% load staticfiles %}
     <link rel="stylesheet" type="text/css" href="{% static "yelpviz/map.css" %}">
+
     <script 
       type="text/javascript"
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBAw0e_FoeYsU00AS1QBNmhwa2k__QJWV0">
     </script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="https://apis.google.com/js/client:platform.js?onload=render" async defer></script>
 
     <!-- GOOGLE MAPS -->
     <script type="text/javascript">
@@ -123,8 +130,41 @@
     <script src="{% static "yelpviz/login.js" %}"></script>
   </head>
   <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">YelpViz</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+
     <div id="map-canvas"></div>
     <div id="login">
+      <div id="google-login-details">
+        <a id="google-logout-button"
+          onclick="googleLogout()"
+          display="none"
+          href="#" 
+          class="btn btn-success btn-xs">
+          <span class="glyphicon glyphicon-user">
+          </span> 
+          Logout
+        </a>
+        <div id="google-login-button"></div>
+      </div>
+
       <div id="fb-login-details">
         <!-- Facebook login button -->
         <fb:login-button autologoutlink="true" onlogin="checkLoginState()"></fb:login-button>
@@ -141,10 +181,9 @@
         </div>
       </div>
 
-      <div id="google-login-details">
-        <button 
-          id="google-login-button"
-          onclick="googleLogin()">Sign in with Google</button>
+      <!-- User information -->
+      <div id="userinfo">
+        <img id="profile-pic" style="width:50px" display="none">
       </div>
     </div>
   </body>

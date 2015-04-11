@@ -1,6 +1,66 @@
 /***************************************************************
  * Generic Login code & user account handling
  */
+ var last_login = null;
+/**
+ * Handles UI response to login/logout events
+ */
+function login_event(is_loggedin, type) {
+
+  if (is_loggedin) {
+    last_login = type;
+  }
+
+  /* probably some async call we dont care about */
+  if (!is_loggedin && last_login == null)
+    return;
+
+  if (!is_loggedin) {
+      last_login = null;
+      /* shut off profile picture */
+      document.getElementById('profile-pic').setAttribute('style', 'display: none');
+      document.getElementById('profile-pic').setAttribute('src', '');
+
+      /* all google login stuff can be shown except logout button */
+      document.getElementById('google-login-details').setAttribute('style', 'display: block');
+      document.getElementById('google-login-button').setAttribute('style', 'display: block');
+      document.getElementById('google-logout-button').setAttribute('style', 'display: none');
+
+      /* all FB stuff, except profile attributes, can be shown */
+      document.getElementById('fb-login-details').setAttribute('style', 'display: block');
+      document.getElementById('fb-logged-in-gui').setAttribute('style', 'display: none');
+  } else if (type == "facebook") {
+      /* shut off google UI, turn on FB profile stuff */
+      document.getElementById('google-login-details').setAttribute('style', 'display: none');
+      document.getElementById('fb-logged-in-gui').setAttribute('style', 'display: block');
+
+      FB.api("/me/picture?width=50&height=50",  function(response) {
+        document.getElementById('profile-pic').setAttribute('style', 'display: block');
+        document.getElementById('profile-pic').setAttribute('src', response.data.url);
+        console.log('Retrieved Facebook profile picture');
+      });  
+  } else if (type == "google") {
+      document.getElementById('google-login-details').setAttribute('style', 'display: block');
+      document.getElementById('google-logout-button').setAttribute('style', 'display: block');
+      document.getElementById('google-login-button').setAttribute('style', 'display: none');
+      document.getElementById('fb-login-details').setAttribute('style', 'display: none');
+      
+
+      /* load user profile & get URL to profile picture */
+      gapi.client.load('plus','v1', function() {
+      var request = gapi.client.plus.people.get({
+          'userId': 'me'
+        });
+        request.execute(function(resp) {
+          if (last_login == 'google') {
+            document.getElementById('profile-pic').setAttribute('style', 'display: block');
+            document.getElementById('profile-pic').setAttribute('src', resp.image.url);
+          }
+          console.log('Retrieved Google+ profile picture');
+        });
+      });
+  }
+}
  
 /***************************************************************
  *
@@ -26,7 +86,7 @@ function signinCallback(authResult) {
   if (authResult['status']['signed_in']) {
     // Update the app to reflect a signed in user
     // Hide the sign-in button now that the user is authorized, for example:
-    document.getElementById('google-login-button').setAttribute('style', 'display: none');
+    login_event(true, "google");
   } else {
     // Update the app to reflect a signed out user
     // Possible error values:
@@ -34,8 +94,7 @@ function signinCallback(authResult) {
     //   "access_denied" - User denied access to your app
     //   "immediate_failed" - Could not automatically log in the user
     console.log('Sign-in state: ' + authResult['error']);
-    document.getElementById('google-login-button').setAttribute('style', 'display: block');
-
+    login_event(false, "google");
   }
 }
 
@@ -51,6 +110,23 @@ function googleLogin() {
   gapi.auth.signIn(additionalParams);
 }
 
+function googleLogout() {
+  gapi.auth.signOut();
+}
+
+/**
+ * Called when Google+ API loads */
+function render() {
+  var additionalParams = {
+    'theme' : 'dark',
+    'callback' : 'signinCallback',
+  };
+  gapi.signin.render('google-login-button', additionalParams);
+  if (last_login != null) {
+    document.getElementById('google-login-button').setAttribute('style', 'display: none');
+  }
+}
+
 /***************************************************************
  *
  * FACEBOOK LOGIN BELOW
@@ -59,26 +135,10 @@ function googleLogin() {
 function statusChangeCallback(response) {
   console.log('statusChangeCallback');
   console.log(response);
-  // The response object is returned with a status field that lets the
-  // app know the current login status of the person.
-  // Full docs on the response object can be found in the documentation
-  // for FB.getLoginStatus().
   if (response.status === 'connected') {
-    // Logged into your app and Facebook.
-    document.getElementById('fb-logged-in-gui').style.display = 'block';
-    testAPI();
-  } else if (response.status === 'not_authorized') {
-    // The person is logged into Facebook, but not your app.
-    document.getElementById('fb-logged-in-gui').style.display = 'none';
-    document.getElementById('fb-status').innerHTML = 'Please log ' +
-      'into this app.';
-
+    login_event(true, "facebook");
   } else {
-    // The person is not logged into Facebook, so we're not sure if
-    // they are logged into this app or not.
-    document.getElementById('fb-logged-in-gui').style.display = 'none';
-    document.getElementById('fb-status').innerHTML = 'Please log ' +
-      'into Facebook.';
+    login_event(false, "facebook");
   }
 }
 
@@ -94,27 +154,14 @@ function checkLoginState() {
 window.fbAsyncInit = function() {
   FB.init({
     appId      : '780541118709132',
-    cookie     : true,  // enable cookies to allow the server to access 
-                        // the session
-    xfbml      : true,  // parse social plugins on this page
-    version    : 'v2.2' // use version 2.2
+    cookie     : true,
+    xfbml      : true,
+    version    : 'v2.2'
   });
 
-  // Now that we've initialized the JavaScript SDK, we call 
-  // FB.getLoginStatus().  This function gets the state of the
-  // person visiting this page and can return one of three states to
-  // the callback you provide.  They can be:
-  //
-  // 1. Logged into your app ('connected')
-  // 2. Logged into Facebook, but not your app ('not_authorized')
-  // 3. Not logged into Facebook and can't tell if they are logged into
-  //    your app or not.
-  //
-  // These three cases are handled in the callback function.
-
-  FB.getLoginStatus(function(response) {
-    statusChangeCallback(response);
-  });
+  // FB.getLoginStatus(function(response) {
+  //   statusChangeCallback(response);
+  // });
 };
 
 // Load the SDK asynchronously
@@ -125,14 +172,3 @@ window.fbAsyncInit = function() {
   js.src = "//connect.facebook.net/en_US/sdk.js";
   fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));
-
-// Here we run a very simple test of the Graph API after login is
-// successful.  See statusChangeCallback() for when this call is made.
-function testAPI() {
-  console.log('Welcome!  Fetching your information.... ');
-  FB.api('/me', function(response) {
-    console.log('Successful login for: ' + response.name);
-    document.getElementById('fb-status').innerHTML =
-      'Thanks for logging in, ' + response.name + '!';
-  });
-}
