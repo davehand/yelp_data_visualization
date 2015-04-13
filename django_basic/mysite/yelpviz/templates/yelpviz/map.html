@@ -44,11 +44,13 @@
         window.map = new google.maps.Map(document.getElementById('map-canvas'),
           mapOptions);
 
-        var swBound = new google.maps.LatLng(38.8282 - 10, -97 - 10);
-        var neBound = new google.maps.LatLng(38.8282 + 10, -97 + 10);
+        //var swBound = new google.maps.LatLng(38.8282 - 10, -97 - 10);
+        //var neBound = new google.maps.LatLng(38.8282 + 10, -97 + 10);
+        var swBound = new google.maps.LatLng(23.7, -129.3);
+        var neBound = new google.maps.LatLng(49.5, -65.3);
         var bounds = new google.maps.LatLngBounds(swBound, neBound);
 
-        var srcImage = '{% static "yelpviz/robot.png" %}';
+        var srcImage = '{% static "yelpviz/tmp.png" %}';
 
         // The custom USGSOverlay object contains the USGS image,
         // the bounds of the image, and a reference to the map.
