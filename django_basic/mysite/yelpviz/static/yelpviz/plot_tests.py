@@ -11,6 +11,7 @@ x = -126.7+61.8*np.random.rand(30)
 y = 16.7*np.random.rand(30) + 30.7
 z = [3, 2, 3, 4, 5, 5, 4, 2, 1, 1, 2, 2, 3, 4, 5, 5, 4, 2, 1, 2, 3, 2, 3, 4, 5, 3, 2, 3, 4, 5]
 
+# Setting boundaries of images (should be same at maps.html)
 x = np.insert(x, 0, -129.3) # At position 0 SW long
 x = np.insert(x, 1, -65.3) # At position 1 NE long
 y = np.insert(y, 0, 23.7) # At position 0 SW lat
@@ -27,14 +28,16 @@ rbf = scipy.interpolate.Rbf(x, y, z, function='gaussian', epsilon=2, smooth=0.0)
 # rbf = scipy.interpolate.Rbf(x, y, z, function='linear', smooth=0.0)
 zi = rbf(xi, yi)
 
+# Mask to remove ratings less than 1
 zi[zi < 1] = 0
-
 mask = ma.masked_where(zi < 1, zi)
 
+# Generate figure from interpolation points
 plt.figure(figsize=(40,20))
 plt.imshow(mask, vmin=1, vmax=5, origin='lower',
            extent=[x.min(), x.max(), y.min(), y.max()], alpha = 0.4)
 
+# Plot the actual positions
 plt.scatter(x, y, c=z)
 plt.axis('off')
 #plt.colorbar()
