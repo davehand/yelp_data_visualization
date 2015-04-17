@@ -43,58 +43,77 @@ def interp(x, y, z, xi, yi, ignore_dist):
 			z_flat[i] = num/dnm
 
 	z_interp = z_flat.reshape(z_interp.shape)
-	z_interp = ndimage.gaussian_filter(z_interp, sigma=(5, 5), order=0)
+	# z_interp = ndimage.gaussian_filter(z_interp, sigma=(5, 5), order=0)
 	return z_interp
 
 def ratingsToRGB(ratings):
-	old_shape = ratings.shape
-	old_shape = list(old_shape)
-	old_shape.append(3);
-	new_data = np.zeros(old_shape)
+	new_shape = list(ratings.shape)
+	new_shape.append(4)
+	rgb = np.zeros(new_shape, np.float)
 
-	ratings = ratings / 5
-	ratings = ratings * 120
+	ratings = ratings - ratings.min()
+	ratings = ratings / ratings.max()
+	colors = [(255, 0, 0),
+		(255, 91, 0),
+		(255, 127, 0),
+		(255, 171, 0),
+		(255, 208, 0),
+		(255, 240, 0),
+		(255, 255, 0),
+		(218, 255, 0),
+		(176, 255, 0),
+		(128, 255, 0),
+		(0, 255, 0),
+		(0, 255, 255),
+		(0, 240, 255),
+		(0, 213, 255),
+		(0, 171, 255),
+		(0, 127, 255),
+		(0, 86, 255),
+		(0, 0, 255)]
+
+	ncols = len(colors)
 	for i in range(len(ratings)):
 		for j in range(len(ratings[i])):
-			col = colorsys.hls_to_rgb(ratings[i, j]/360.0, 1.0, 0.5)
-			new_data[i, j, 0] = col[0]
-			new_data[i, j, 1] = col[1]
-			new_data[i, j, 2] = col[2]
-
-	return np.matrix(data)
+			r = ratings[i, j]
+			col_idx = int(r * (ncols - 1))
+			rgb[i, j, 0] = colors[col_idx][0]/255.0
+			rgb[i, j, 1] = colors[col_idx][1]/255.0
+			rgb[i, j, 2] = colors[col_idx][2]/255.0
+			rgb[i, j, 3] = 1
+	return rgb
 			
 
-def generate_map(x, y, z, clus_data, output):
+def generate_map(x, y, z, clus_data, output, alpha):
 
 	# Setting boundaries of images (should be same at maps.html)
-	x = np.insert(x, 0, -129.3) # At position 0 SW long
-	x = np.insert(x, 1, -62.3) # At position 1 NE long
-	y = np.insert(y, 0, 23.7) # At position 0 SW lat
-	y = np.insert(y, 1, 49.5) # At position 1 NE lat
-	z = np.insert(z, 0, 0) # 0 stars for bound
-	z = np.insert(z, 1, 0) # 0 stars for bound
+	x = np.insert(x, 0, -129.3)			# At position 0 SW long
+	x = np.insert(x, 1, -62.3)			# At position 1 NE long
+	y = np.insert(y, 0, 23.7)			# At position 0 SW lat
+	y = np.insert(y, 1, 49.5)			# At position 1 NE lat
+	z = np.insert(z, 0, 0)				# 0 stars for bound
+	z = np.insert(z, 1, 0)				# 0 stars for bound
 
 	# get a custom interpolation based off an a weighted average
 	# of nearby weights
 	xi, yi = np.linspace(x.min(), x.max(), 2000), np.linspace(y.min(), y.max(), 2000)
 	z_interp = interp(x, y, z, xi, yi, 5000)
-	# z_interp = ratingsToRGB(z_interp)
+	z_interp = ratingsToRGB(z_interp)
+	# z_interp = ndimage.gaussian_filter(z_interp, sigma=(5, 5, 0), order=0)
 
 	# use the mask from a regular RBF interpolation to cut out pieces of
 	# the above result
 	xi, yi = np.meshgrid(xi, yi)
 	rbf = scipy.interpolate.Rbf(clus_data[:, 0], clus_data[:, 1], clus_data[:, 2], function='gaussian', epsilon=2, smooth=0.0)
 	zi = rbf(xi, yi)
-	zi[zi < 1] = 0
-
-	# use RBF values to mask custom interpolation
-	mask = ma.masked_where(zi < 1, z_interp)
-
+	zi[zi < 0.5] = 0
+	zi[zi != 0] = alpha
+	
+	# apply the mask to the 4th channel, which identifies the alpha level
+	z_interp[:, :, 3] = zi
 
 	plt.figure(figsize=(40,20))
-	plt.imshow(mask, vmin=1, vmax=5, origin='lower',
-	           extent=[x.min(), x.max(), y.min(), y.max()],
-	           alpha = 1)
+	plt.imshow(z_interp, origin='lower', extent=[x.min(), x.max(), y.min(), y.max()])
 
 	# Plot the actual positions
 	plt.scatter(x, y, c=z)
@@ -168,4 +187,4 @@ if __name__ == '__main__':
 		clus_data[i, 2] = np.average(clusters[(clusters[:, 0] == c).A1, 3])
 		i += 1
 
-	generate_map(data[:, 0].A1, data[:, 1].A1, data[:, 2].A1, clus_data, 'static/yelpviz/tmp.png')
+	generate_map(data[:, 0].A1, data[:, 1].A1, data[:, 2].A1, clus_data, 'static/yelpviz/tmp.png', 1)
