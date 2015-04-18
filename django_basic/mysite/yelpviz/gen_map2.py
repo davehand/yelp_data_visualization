@@ -12,6 +12,7 @@ from sklearn.cluster import DBSCAN
 from sklearn.neighbors import NearestNeighbors
 import scipy.ndimage as ndimage
 import colorsys
+import Image
 
 # Returns an interpolation based on the ratings of near by neighbors,
 # weighted proportional to the inverse distance from a given point
@@ -112,13 +113,12 @@ def generate_map(x, y, z, clus_data, output, alpha):
 	# apply the mask to the 4th channel, which identifies the alpha level
 	z_interp[:, :, 3] = zi
 
-	plt.figure(figsize=(40,20))
-	plt.imshow(z_interp, origin='lower', extent=[x.min(), x.max(), y.min(), y.max()])
-
-	# Plot the actual positions
-	plt.scatter(x, y, c=z)
-	plt.axis('off')
-	savefig(output, transparent = True, bbox_inches='tight', pad_inches=0)
+	fig = plt.figure(frameon=False)
+	ax = plt.Axes(fig, [0., 0., 1., 1.])
+	ax.set_axis_off()
+	fig.add_axes(ax)
+	ax.imshow(z_interp, aspect='normal', origin='lower', extent=[x.min(), x.max(), y.min(), y.max()])
+	savefig(output)
 
 """
 Performs clustering on a matrix, X, using features FEATURES. FEATURES

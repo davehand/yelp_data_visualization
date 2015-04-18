@@ -38,8 +38,9 @@ def generate_map(x, y, z, output):
 
 	# Generate figure from interpolation points
 	plt.figure(figsize=(40,20))
+	# plt.tight_layout(pad=0, w_pad=0, h_pad=0)
 	plt.imshow(mask, vmin=1, vmax=5, origin='lower',
-	           extent=[x.min(), x.max(), y.min(), y.max()], alpha = 1)
+	           extent=[x.min(), x.max(), y.min(), y.max()], alpha = 0.5)
 
 	# Plot the actual positions
 

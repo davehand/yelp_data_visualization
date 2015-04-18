@@ -17,19 +17,25 @@ rds_dsn =      cx_Oracle.makedsn(rds_host, 1521, rds_sid)
 rds_conn_str = rds_username + '/' + rds_password + '@' + rds_dsn
 
 def index(request):
-	con = cx_Oracle.connect(rds_conn_str)
-	cur = con.cursor()
-	resp = "<b>These businesses have more than 50 locations!</b>\n"
+	#how to access form data
+	if request.method == 'GET':
+		print request.GET.get('business')
 
-	cur.execute('SELECT name from business GROUP BY name having COUNT(name) > 50')
-	for result in cur:
-		resp += result[0]
-		resp += "<br></br>"
+	#con = cx_Oracle.connect(rds_conn_str)
+	#ur = con.cursor()
+	#resp = "<b>These businesses have more than 50 locations!</b>\n"
 
-	cur.close()
-	con.close()
+	#cur.execute('SELECT name from business GROUP BY name having COUNT(name) > 50')
+	#for result in cur:
+	#	resp += result[0]
+	#	resp += "<br></br>"
 
-	return HttpResponse(resp)
+	#cur.close()
+	#con.close()
+
+	#return HttpResponse(resp)
+	return render_to_response("yelpviz/map.html")
+
 
 def home(request):
 	return render_to_response("yelpviz/map.html")
