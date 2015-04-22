@@ -4,5 +4,6 @@ from yelpviz import views
 
 urlpatterns = patterns('',
     url(r'^$', views.home, name='home'),
-    url(r'^bsearch$', views.index, name='index'),
+    url(r'^bsearch$', views.bsearch, name='bsearch'),
+    url(r'^csearch$', views.csearch, name='csearch'),
 )

@@ -48,18 +48,18 @@
         // the bounds of the image, and a reference to the map.
         overlay = new USGSOverlay(bounds, srcImage, window.map);
 
-    	// Adding a marker on Las Vegas
-    	//var myLatlng = new google.maps.LatLng(36.125,-115.175);	 
-           	//var contentString = 'Las Vegas, NV';
-    	//var infowindow = new google.maps.InfoWindow({
-    	//	content: contentString
-    	//});
+    	// // Adding a marker on Las Vegas
+    	// var myLatlng = new google.maps.LatLng(36.125,-115.175);	 
+     //       	var contentString = 'Las Vegas, NV';
+    	// var infowindow = new google.maps.InfoWindow({
+    	// 	content: contentString
+    	// });
     	
-    	//var marker = new google.maps.Marker({
-    	//	position: myLatlng,
-    	//	map: window.map,
-    	//	title: 'Las Vegas'
-    	//});
+    	// var marker = new google.maps.Marker({
+    	// 	position: myLatlng,
+    	// 	map: window.map,
+    	// 	title: 'Las Vegas'
+    	// });
     	//google.maps.event.addListener(marker, 'click', function(){
     	//	infowindow.open(window.map,marker);
     	//)};
@@ -168,6 +168,26 @@
           <select class="form-control" name="business">
             <option value="McDonald''s">McDonald's</option>
             <option value="Supercuts">Supercuts</option>
+          </select>
+          <select class="form-control" name="scale">
+            <option value="0.5">0.5</option>
+            <option value="0.75">0.75</option>
+            <option value="1.0">1.0</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+      </form>
+      <p class="navbar-text">Select Business Category</p>
+      <form class="navbar-form navbar-left" role="search" action="/yelpviz/csearch" method="GET">
+        <div class="form-group">
+          <select class="form-control" name="business_category">
+            <option value="McDonald''s">McDonald's</option>
+            <option value="Supercuts">Supercuts</option>
+          </select>
+          <select class="form-control" name="scale">
+            <option value="0.5">0.5</option>
+            <option value="0.75">0.75</option>
+            <option value="1.0">1.0</option>
           </select>
         </div>
         <button type="submit" class="btn btn-default">Submit</button>

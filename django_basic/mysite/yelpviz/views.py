@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.shortcuts import render_to_response
 import sys
+from dynamo_connect import Dynamo
 
 import os
 os.environ['LD_LIBRARY_PATH'] = '/usr/lib/oracle/11.2/client64/lib/'
@@ -16,10 +17,25 @@ rds_port =     1521
 rds_dsn =      cx_Oracle.makedsn(rds_host, 1521, rds_sid)
 rds_conn_str = rds_username + '/' + rds_password + '@' + rds_dsn
 
-def index(request):
+def bsearch(request):
 	#how to access form data
 	if request.method == 'GET':
 		print request.GET.get('business')
+		print request.GET.get('scale')
+	
+	#logic for connecting to the dynamodb and getting the image
+	dydb = Dynamo()
+	#hash_key will be business name, range_key is scaling factor
+	heat_map = dydb.get_map(table='Business', hash_key='1', range_key='0.5')
+	if heat_map == None:
+		#code for generating map on the fly and adding map to dynamo
+		#need to turn the map generation code into a class with a method for this
+		#someone else who is more familiar with that code should do this - Dave
+		print "hi"
+	else:
+		f = open('/home/ec2-user/yelp_data_visualization/django_basic/mysite/yelpviz/static/yelpviz/tmp.png', 'wb')
+		f.write(heat_map)
+		f.close()
 
 	#con = cx_Oracle.connect(rds_conn_str)
 	#ur = con.cursor()
@@ -36,6 +52,28 @@ def index(request):
 	#return HttpResponse(resp)
 	return render_to_response("yelpviz/map.html")
 
+def csearch(request):
+	#how to access form data
+	if request.method == 'GET':
+		print request.GET.get('business_category')
+		print request.GET.get('scale')
+	
+	#logic for connecting to the dynamodb and getting the image
+	dydb = Dynamo()
+	#hash_key will be business name, range_key is scaling factor
+	heat_map = dydb.get_map(table='Business_Category', hash_key='1', range_key='0.5')
+	if heat_map == None:
+		#code for generating map on the fly and adding map to dynamo
+		#need to turn the map generation code into a class with a method for this
+		#someone else who is more familiar with that code should do this - Dave
+		print "hi"
+	else:
+		f = open('/home/ec2-user/yelp_data_visualization/django_basic/mysite/yelpviz/static/yelpviz/tmp.png', 'wb')
+		f.write(heat_map)
+		f.close()
+
+	#return HttpResponse(resp)
+	return render_to_response("yelpviz/map.html")
 
 def home(request):
 	return render_to_response("yelpviz/map.html")
