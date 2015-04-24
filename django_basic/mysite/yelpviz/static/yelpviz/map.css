@@ -30,3 +30,7 @@ html, body, #map-canvas {
 	padding-left: 15px;
 	padding-right: 15px;
 }
+
+select.form-control {
+	font-size: 12px;
+}

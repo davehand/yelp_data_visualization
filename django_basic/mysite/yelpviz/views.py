@@ -18,15 +18,16 @@ rds_dsn =      cx_Oracle.makedsn(rds_host, 1521, rds_sid)
 rds_conn_str = rds_username + '/' + rds_password + '@' + rds_dsn
 
 def bsearch(request):
-	#how to access form data
+	entity = request.GET.get('business').replace("''", "'")
+	scale = request.GET.get('scale')
+
 	if request.method == 'GET':
-		print request.GET.get('business')
-		print request.GET.get('scale')
-	
+		print 'Querying business \'%s\' at scale %s' % (entity, scale)
+
 	#logic for connecting to the dynamodb and getting the image
 	dydb = Dynamo()
 	#hash_key will be business name, range_key is scaling factor
-	heat_map = dydb.get_map(table='Business', hash_key='1', range_key='0.5')
+	heat_map = dydb.get_map(table='Business', hash_key=entity, range_key=scale)
 	if heat_map == None:
 		#code for generating map on the fly and adding map to dynamo
 		#need to turn the map generation code into a class with a method for this
@@ -53,15 +54,17 @@ def bsearch(request):
 	return render_to_response("yelpviz/map.html")
 
 def csearch(request):
-	#how to access form data
+	entity = request.GET.get('business').replace("''", "'")
+	scale = request.GET.get('scale')
+
 	if request.method == 'GET':
-		print request.GET.get('business_category')
-		print request.GET.get('scale')
+		print 'Querying category \'%s\' at scale %s' % (entity, scale)
+	
 	
 	#logic for connecting to the dynamodb and getting the image
 	dydb = Dynamo()
 	#hash_key will be business name, range_key is scaling factor
-	heat_map = dydb.get_map(table='Business_Category', hash_key='1', range_key='0.5')
+	heat_map = dydb.get_map(table='Business_Category', hash_key=entity, range_key=scale)
 	if heat_map == None:
 		#code for generating map on the fly and adding map to dynamo
 		#need to turn the map generation code into a class with a method for this
