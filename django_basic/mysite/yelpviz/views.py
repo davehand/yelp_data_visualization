@@ -10,6 +10,7 @@ os.environ['LD_LIBRARY_PATH'] = '/usr/lib/oracle/11.2/client64/lib/'
 os.environ['ORACLE_HOME'] = '/usr/lib/oracle/11.2/client64/'
 import cx_Oracle
 
+#code for connecting to the rds db
 rds_host =     'yelp.czscqrbdzjc7.us-east-1.rds.amazonaws.com'
 rds_sid =      'ouryelp'
 rds_username = 'damn'
@@ -44,7 +45,7 @@ def bsearch(request):
 
 		dydb.add_map(table='Business', hash_key=entity, range_key=str(scale), map_data=img_data)
 		heat_map = dydb.get_map(table='Business', hash_key=entity, range_key=scale)
-	
+
 	f = open('/home/ec2-user/yelp_data_visualization/django_basic/mysite/yelpviz/static/yelpviz/tmp.png', 'wb')
 	f.write(heat_map)
 	f.close()
@@ -71,7 +72,8 @@ def bsearch(request):
 
 		if (row[1] <= 49.5 and row[1] >= 23.7 and row[0] <= -62.3 and row[0] >= -129.3):
 			data.append(row)
-	
+
+        #save data for markers
 	json_data = json.dumps(data)
 	with open('/home/ec2-user/yelp_data_visualization/django_basic/mysite/yelpviz/static/yelpviz/markers_data.txt', 'w') as f:
 		 json.dump(json_data, f, ensure_ascii=False)
@@ -85,8 +87,8 @@ def csearch(request):
 
 	if request.method == 'GET':
 		print 'Querying category \'%s\' at scale %s' % (entity, scale)
-	
-	
+
+
 	#logic for connecting to the dynamodb and getting the image
 	dydb = Dynamo()
 	#hash_key will be business name, range_key is scaling factor
@@ -129,6 +131,8 @@ def csearch(request):
 
 		if (row[1] <= 49.5 and row[1] >= 23.7 and row[0] <= -62.3 and row[0] >= -129.3):
 			data.append(row)
+
+        #save data for markers
 	json_data = json.dumps(data)
 	with open('/home/ec2-user/yelp_data_visualization/django_basic/mysite/yelpviz/static/yelpviz/markers_data.txt', 'w') as f:
 		 json.dump(json_data, f, ensure_ascii=False)
