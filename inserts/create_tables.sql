@@ -22,6 +22,8 @@ Create table review (
   review_id char(22) not null,
   business_id char(22) not null,
   stars number(1),
+  useful_votes number(10),
+  review_date date,
   CONSTRAINT business_review_pk PRIMARY KEY (review_id, business_id),
   CONSTRAINT fk_business_id2
     FOREIGN KEY (business_id)

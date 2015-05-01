@@ -19,7 +19,7 @@ with open("review.csv", "rb") as source:
                 row_one.append(c)
             header_string += row_one[0].rstrip()
             #for x in range(1,len(row_one)):
-            for x in range(1,3):
+            for x in range(1,5):
                 header_string += ", " + row_one[x].rstrip()
         else:
             cols = []
@@ -31,7 +31,7 @@ with open("review.csv", "rb") as source:
                 values_string = "'" +  cols[0].rstrip() + "'"
             i = 0
             #for x in range(1,len(cols)):
-            for x in range(1,3):
+            for x in range(1,5):
                 if (cols[x].rstrip() == ''):
                     values_string += ", null"
                 else:
@@ -40,7 +40,7 @@ with open("review.csv", "rb") as source:
                         val = val.replace("'", "''")
                     #values_string += ", '" + val + "'"
                     #review only
-                    if i == 1:
+                    if i == 1 or  i == 2:
                         values_string += ", " + val
                     else:
                         values_string += ", '" + val + "'"
