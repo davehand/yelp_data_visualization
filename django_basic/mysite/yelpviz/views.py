@@ -49,18 +49,6 @@ def bsearch(request):
 	f.write(heat_map)
 	f.close()
 
-	#con = cx_Oracle.connect(rds_conn_str)
-	#ur = con.cursor()
-	#resp = "<b>These businesses have more than 50 locations!</b>\n"
-
-	#cur.execute('SELECT name from business GROUP BY name having COUNT(name) > 50')
-	#for result in cur:
-	#	resp += result[0]
-	#	resp += "<br></br>"
-
-	#cur.close()
-	#con.close()
-
 
 	sql = "Select b.longitude, b.latitude, br.avg_rating " + \
 		"From business b, business_rating br " + \
@@ -85,7 +73,7 @@ def bsearch(request):
 			data.append(row)
 	
 	json_data = json.dumps(data)
-	with open('static/yelpviz/markers_data.txt', 'w') as f:
+	with open('/home/ec2-user/yelp_data_visualization/django_basic/mysite/yelpviz/static/yelpviz/markers_data.txt', 'w') as f:
 		 json.dump(json_data, f, ensure_ascii=False)
 	f.close()
 	#return HttpResponse(resp)
@@ -142,7 +130,7 @@ def csearch(request):
 		if (row[1] <= 49.5 and row[1] >= 23.7 and row[0] <= -62.3 and row[0] >= -129.3):
 			data.append(row)
 	json_data = json.dumps(data)
-	with open('static/yelpviz/markers_data.txt', 'w') as f:
+	with open('/home/ec2-user/yelp_data_visualization/django_basic/mysite/yelpviz/static/yelpviz/markers_data.txt', 'w') as f:
 		 json.dump(json_data, f, ensure_ascii=False)
 	f.close()
 	#return HttpResponse(resp)
