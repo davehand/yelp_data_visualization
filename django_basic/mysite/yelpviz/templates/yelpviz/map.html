@@ -17,6 +17,16 @@
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBAw0e_FoeYsU00AS1QBNmhwa2k__QJWV0">
     </script>
 
+    <script>
+      function validateBusinessForm() {
+      var x = document.forms["bsearch"]["business"].value;
+      if (x == null || x == "") {
+	alert("Business must be selected");
+	return false;
+      }
+      }
+    </script>
+
     <!-- GOOGLE MAPS -->
     <script type="text/javascript">
       var overlay;
@@ -48,23 +58,41 @@
         // the bounds of the image, and a reference to the map.
         overlay = new USGSOverlay(bounds, srcImage, window.map);
 
-    	// // Adding a marker on Las Vegas
-    	// var myLatlng = new google.maps.LatLng(36.125,-115.175);	 
-     //       	var contentString = 'Las Vegas, NV';
-    	// var infowindow = new google.maps.InfoWindow({
-    	// 	content: contentString
-    	// });
-    	
-    	// var marker = new google.maps.Marker({
-    	// 	position: myLatlng,
-    	// 	map: window.map,
-    	// 	title: 'Las Vegas'
-    	// });
-    	//google.maps.event.addListener(marker, 'click', function(){
-    	//	infowindow.open(window.map,marker);
-    	//)};
-	}
-      
+    	//  Adding markers
+
+      $.ajax({
+	  url: '{% static "yelpviz/markers_data.txt" %}',
+ 	  dataType: "json",
+  	  success: function(response) {
+		var locations = JSON.parse(response);
+		make_markers(locations)
+	  }
+      });
+
+
+      }
+
+      function make_markers(locations){
+	
+	var marker, i;
+	var infowindow = new google.maps.InfoWindow();
+
+        for (i = 0; i < locations.length; i++) {
+          marker = new google.maps.Marker({
+            position: new google.maps.LatLng(locations[i][1], locations[i][0]),
+            map: window.map
+          });
+
+          google.maps.event.addListener(marker, 'click', (function(marker, i) {
+            return function() {
+              infowindow.setContent(locations[i][2]);
+              infowindow.open(window.map, marker);
+            }
+          })(marker, i));
+        }
+
+      }
+
       /** @constructor */
       function USGSOverlay(bounds, image, map) {
 
@@ -163,9 +191,10 @@
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <p style="font-size:12px;" class="navbar-text">Business and Confidence</p>
-      <form class="navbar-form navbar-left" role="search" action="/yelpviz/bsearch" method="GET">
+      <form name="bsearch" class="navbar-form navbar-left" role="search" action="/yelpviz/bsearch" method="GET">
         <div class="form-group">
-          <select class="form-control" name="business">
+          <select class="form-control" name="business" required>
+	    <option value="" disabled selected>Select Business</option>
             <option value="McDonald's">McDonald's</option>
             <option value="Taco Bell">Taco Bell</option>
             <option value="Jimmy John's">Jimmy John's</option>
@@ -196,9 +225,10 @@
         <button style="font-size:12px;" type="submit" class="btn btn-default">Submit</button>
       </form>
       <p style="font-size:12px;" class="navbar-text">Business Category and Confidence</p>
-      <form class="navbar-form navbar-left" role="search" action="/yelpviz/csearch" method="GET">
+      <form name="csearch" class="navbar-form navbar-left" role="search" action="/yelpviz/csearch" method="GET">
         <div class="form-group">
-          <select class="form-control" name="business_category">
+          <select class="form-control" name="business_category" required>
+	    <option value="" disabled selected>Select Category</option>
             <option value="Hotels & Travel">Hotels & Travel</option>
             <option value="Home Services">Home Services</option>
             <option value="Active Life">Active Life</option>
@@ -247,6 +277,7 @@
             <div id="userinfo">
               <img id="profile-pic" style="width:50px" display="none">
             </div>
+
           </div>
         </li>
       </ul>
