@@ -15,6 +15,7 @@ Project Description:
 - Using Yelp Dataset Challenge Data
 
 Instructions for getting setup:
+- For csvs and inserts, we decided they were too big to submit. So if you want to see them, we linked to them on Dropbox: https://www.dropbox.com/sh/0k5s8wlveecsyqm/AAAQGN6juTHxrVaykzmV5DxXa?dl=0
 - For dataset:
   1. Download yelp dataset
   2. Use the json to csv converter script to convert the json files
