@@ -17,6 +17,7 @@ import Image
 from dynamo_connect import Dynamo
 
 class MapGen:
+	# Creates a new MapGen object and populates location data by querying the DB
 	def __init__(self, entity, scale, is_business):
 		entity = entity.replace("'", "''")
 		if is_business:
@@ -74,6 +75,7 @@ class MapGen:
 		self.is_business = is_business
 		self.entity = entity
 
+	# Generate a map and persist it to the specified output directory
 	def gen_and_save(self, output, n_px):
 		self.generate_map(output, 1, n_px)
 
@@ -110,6 +112,9 @@ class MapGen:
 		z_interp = z_flat.reshape(z_interp.shape)
 		return z_interp
 
+	# Converts a matrix of ratings on any scale to a RGBA color map. The RGBA
+	# color map is like a standard RBG color map, but with an additional channel
+	# that controls the opacity level, which is set to 1 here
 	def ratingsToRGB(self, ratings):
 		new_shape = list(ratings.shape)
 		new_shape.append(4)
@@ -126,8 +131,6 @@ class MapGen:
 			(255, 0, 0),
 			(255, 0, 0),
 			(255, 0, 0),
-			# (255, 0, 0),
-			# (255, 0, 0),
 			(255, 91, 0),
 			(255, 127, 0),
 			(255, 171, 0),
@@ -138,14 +141,7 @@ class MapGen:
 			(100, 255, 0),
 			(60, 255, 0),
 			(0, 255, 0),
-		]#,
-			# (0, 255, 255),
-			# (0, 240, 255),
-			# (0, 213, 255),
-			# (0, 171, 255),
-			# (0, 127, 255),
-			# (0, 86, 255),
-			# (0, 0, 255)]
+		]
 
 		ncols = len(colors)
 		for i in range(len(ratings)):
@@ -204,15 +200,14 @@ class MapGen:
 		savefig(output)
 
 
-	"""
-	Performs clustering on a matrix, X, using features FEATURES. FEATURES
-	determines which columns will be used to cluster, and these columns will be
-	treated as numeric values. For example, if FEATURES = [0, 2], then columns
-	0 and 2 will be used as features to cluster the data on, but the returned 
-	matrix includes all original features. The cluster value will be inserted
-	as the first column. Data that was not included in any cluster is given a
-	cluster ID of -1
-	"""
+	
+	# Performs clustering on a matrix, X, using features FEATURES. FEATURES
+	# determines which columns will be used to cluster, and these columns will be
+	# treated as numeric values. For example, if FEATURES = [0, 2], then columns
+	# 0 and 2 will be used as features to cluster the data on, but the returned 
+	# matrix includes all original features. The cluster value will be inserted
+	# as the first column. Data that was not included in any cluster is given a
+	# cluster ID of -1
 	def cluster(self, x, features):
 		x_to_clus = x[:, features].astype(float)
 		# run DBSCAN clustering algorithm for fast clustering
@@ -222,9 +217,7 @@ class MapGen:
 		x_clus = np.append(labels, x, axis = 1)
 		return x_clus
 
-	"""
-	Converts all no-cluster rows to unique clusters
-	"""
+	# Converts all no-cluster rows to unique clusters
 	def differentiate_no_cluster(self, x):
 		new_clus = -1
 		for i in range(len(x)):
@@ -233,35 +226,59 @@ class MapGen:
 				new_clus -= 1
 		return x
 
+
+# Generates all maps for businesses and categories that meet the following
+# criteria:
+#	Businesses:
+#		At least 50 locations
+#		At most 20 businesses, taking the ones with the most locations
+#	Categories:
+#		At least 50 location for the category
+#		At most 20 businesses, taking the ones with the most locations
+#
+# The generated images are cached on disk and then stored in a Dynamo DB
+# connection, using the dynamo_connect.Dynamo class
 if __name__ == '__main__':
 
 	dyn = Dynamo()
+	# image output dimensions: size x size
 	size = 1000
 	scales = [0.5, 0.75, 1.0]
-	sql_bz = 'SELECT * FROM (SELECT name from business GROUP BY name having COUNT(name) > 50 ORDER BY COUNT(name) DESC) WHERE ROWNUM <= 20'
-	sql_cat = 'SELECT * FROM (SELECT category FROM business_category bc, business b WHERE bc.business_id = b.business_id HAVING COUNT(category) > 50 GROUP BY category ORDER BY COUNT(category) DESC) WHERE ROWNUM <= 20'
+	sql_bz = 'SELECT * FROM ' + \
+				'(SELECT name ' + \
+					'FROM business ' + \
+					'GROUP BY name having COUNT(name) > 50 ' + \
+					'ORDER BY COUNT(name) DESC) ' + \
+				'WHERE ROWNUM <= 20'
+	
+	sql_cat = 'SELECT * FROM ' + \
+				'(SELECT category ' + \
+					'FROM business_category bc, business b ' + \
+					'WHERE bc.business_id = b.business_id ' + \
+					'HAVING COUNT(category) > 50 ' + \
+					'GROUP BY category ORDER BY COUNT(category) DESC) ' + \
+				'WHERE ROWNUM <= 20'
 
 	con = cx_Oracle.connect(views.rds_conn_str)
 	cur = con.cursor()
 	cur.execute(sql_bz)
 	result = cur.fetchall()
 
-	# print("Generating business maps")
-	# for row in result:
-	# 	for scale in scales:
-	# 		out = 'tmp_map_data/business_' + row[0] + '_' + str(scale) + '.png'
-	# 		print("\t...generating '%s'" % out)
+	print("Generating business maps")
+	for row in result:
+		for scale in scales:
+			out = 'tmp_map_data/business_' + row[0] + '_' + str(scale) + '.png'
+			print("\t...generating '%s'" % out)
 
-	# 		mg = MapGen(row[0], scale, True)
-	# 		mg.gen_and_save(out, size)
+			mg = MapGen(row[0], scale, True)
+			mg.gen_and_save(out, size)
 
-	# 		f = open(out, 'rb')
-	# 		img_data = f.read()
-	# 		f.close()
+			f = open(out, 'rb')
+			img_data = f.read()
+			f.close()
 
-	# 		dyn.add_map(table='Business', hash_key=row[0], range_key=str(scale), map_data=img_data)
-
-	# cur.close()
+			dyn.add_map(table='Business', hash_key=row[0], range_key=str(scale), map_data=img_data)
+	cur.close()
 
 	cur = con.cursor()
 	cur.execute(sql_cat)
