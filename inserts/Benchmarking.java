@@ -26,7 +26,7 @@ public class Benchmarking {
 		ResultSet result;
 		ResultSetMetaData resultMetaData;
 		
-		int numTrials = 500;
+		int numTrials = 500; // Number of times to execute the query
 		long startTime = System.currentTimeMillis();
 
 		for (int i = 0; i < numTrials; i++) {
@@ -36,6 +36,7 @@ public class Benchmarking {
 				connection = DriverManager.getConnection(url, username, password);
 				statement = connection.createStatement();
 	
+				// Query to determine average business rating
 				String query = "WITH aggregate_scores_votes AS\n" +
 							   "(\n"
 							   	+ "SELECT business_id, sum(stars * (useful_votes + 1)) AS total_score, sum(useful_votes + 1) as total_votes\n"
@@ -53,11 +54,6 @@ public class Benchmarking {
 							 	+ "AND business.NAME = 'McDonald''s'\n";
 				
 				result = statement.executeQuery(query);
-	
-				//Uncomment to check results 
-	//			while (result.next()) {
-	//				System.out.println(result.getString(1) + ",  " + result.getString(2) + ",  " + result.getString(3));
-	//			}
 				
 				// Close the connections
 				result.close();
@@ -68,14 +64,11 @@ public class Benchmarking {
 	
 			} catch (SQLException e) {
 				e.printStackTrace();
-			}
-			
+			}	
 		}
 
 		long stopTime = System.currentTimeMillis();
 		
 		System.out.println("Average query execution time: " + (stopTime - startTime)/numTrials + " milliseconds");
-		
 	}
-
 }

@@ -5,7 +5,6 @@ import java.sql.*;
 public class YelpReviews {
 
 	public static void main(String[] args) {
-		
 		// Load the driver
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
@@ -27,6 +26,7 @@ public class YelpReviews {
 			connection = DriverManager.getConnection(url, username, password);
 			statement = connection.createStatement();
 			
+			// Query the DB to find out the total number of businesses
 			String query = "SELECT COUNT(*) AS num_businesses " +
 						   "FROM BUSINESS";
 			result = statement.executeQuery(query);
@@ -36,10 +36,9 @@ public class YelpReviews {
 			
 			String[] insertions = new String[numBusinesses];
 			
-			// Execute the query
+			// Execute the query for all reviews
 			query = "SELECT business_id, stars, useful_votes " +
 						   "FROM review " +
-//						   "WHERE ROWNUM < 2000 " +
 						   "ORDER BY business_id";
 			result = statement.executeQuery(query);
 			
@@ -47,10 +46,13 @@ public class YelpReviews {
 			int index = 0;
 			
 			while (resultsRemaining) {
+				
 				int totalVotes = 0;
 				int totalScore = 0;
 				String currentID = result.getString("business_id");
 				
+				// Query results are ordered by business_id, so we iterate through
+				// all of a business's reviews consecutively
 				while (result.getString("business_id").equals(currentID)) {
 					int votes = Integer.parseInt(result.getString("useful_votes")) + 1;
 					int stars = Integer.parseInt(result.getString("stars"));
@@ -63,12 +65,14 @@ public class YelpReviews {
 					}
 				}
 				
+				// Calculate the average rating for each business
 				double avgScore = (double) totalScore / totalVotes;
 				String avgRating = avgScore + "";
 				if (avgRating.length() > 5) {
 					avgRating = avgRating.substring(0, 5);
 				}
 				
+				// Store the corresponding INSERT statement in an array
 				String insertion = "INSERT INTO business_rating VALUES ('" + currentID + "', " + avgRating + ")";
 				insertions[index] = insertion;
 				
@@ -78,31 +82,7 @@ public class YelpReviews {
 				index++;
 			}
 			
-			
-//			resultMetaData = result.getMetaData();
-//			
-//			// Print out the header line first
-//			String header = resultMetaData.getColumnLabel(1) + "\t\t" 
-//							+ resultMetaData.getColumnLabel(2)+ "\t" 
-//							+ resultMetaData.getColumnLabel(3);
-//			System.out.println(header);
-//			
-//			// For all tuples returned by the query, print out their results (tab-separated)
-//			while (result.next()) {
-//				String id = result.getString("business_id");
-//				double stars = Double.parseDouble(result.getString("stars"));
-//				double votes = Double.parseDouble(result.getString("useful_votes")) + 1;
-//				
-//				
-//				String tuple = result.getString("business_id") + "\t"
-//								+ result.getString("stars") + "\t"
-//								+ result.getString("useful_votes");
-//				System.out.println(tuple);
-//			}
-			
-//			String insertion = "INSERT INTO business_rating VALUES ('tqu42L0qXzkvyKSruOz0IA', 4.444)";
-//			statement.execute(insertion);
-			
+			// Execute all of the INSERT statements
 			for (int i = 0; i < insertions.length; i++) {
 				if (insertions[i] != null) {
 					if (i % (numBusinesses / 1000) == 0) {
@@ -120,7 +100,5 @@ public class YelpReviews {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 	}
-
 }
