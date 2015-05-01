@@ -16,12 +16,12 @@ Project Description:
 
 Instructions for getting setup:
 - For dataset:
-1. Download yelp dataset
-2. Use the json to csv converter script to convert the json files
-3. Use the get_cols and split_cats scripts to get the specific columns you want
-4. Use the insert_data script to create the insert data script from the data you have
-5. Run the create tables sql file and the other generated files to insert the data
+  1. Download yelp dataset
+  2. Use the json to csv converter script to convert the json files
+  3. Use the get_cols and split_cats scripts to get the specific columns you want
+  4. Use the insert_data script to create the insert data script from the data you have
+  5. Run the create tables sql file and the other generated files to insert the data
 
 - For django:
-1. Install django and cxOracle
-2. You can run 'sh runserver.sh' to start the django server
+  1. Install django and cxOracle
+  2. You can run 'sh runserver.sh' to start the django server
