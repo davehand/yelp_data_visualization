@@ -6,8 +6,8 @@ CIS 550 Project Using Yelp Dataset
 Directories:
 - csvs: original and updated csvs with desired columns
 - inserts: insert scripts for tables, benchmarking code for complex queries
-- django: django code
-- django_basic: the web application
+- django-1.7.7: django code
+- django: the web application
 
 Project Description:
 - Running Django on AWS EC2
